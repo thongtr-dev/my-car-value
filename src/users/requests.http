@@ -5,3 +5,20 @@ Content-Type: application/json
     "email": "admin-4@email.com",
     "password": "Abc123!@#"
 }
+
+###
+GET http://localhost:3000/auth/2
+
+###
+GET http://localhost:3000/auth?email=admin-4@email.com
+
+###
+DELETE http://localhost:3000/auth/4
+
+###
+PATCH http://localhost:3000/auth/3
+Content-Type: application/json
+
+{
+    "email": "user@email.com"
+}
