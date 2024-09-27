@@ -7,6 +7,15 @@ Content-Type: application/json
 }
 
 ###
+POST http://localhost:3000/auth/signin
+Content-Type: application/json
+
+{
+    "email": "admin-8@email.com",
+    "password": "Abc123!@#"
+}
+
+###
 GET http://localhost:3000/auth/2
 
 ###

@@ -8,6 +8,8 @@ import {
   Query,
   Controller,
   NotFoundException,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthService } from './auth/auth.service';
@@ -27,6 +29,12 @@ export class UsersController {
   @Post('/signup')
   createUser(@Body() body: CreateUserDto) {
     return this.authService.signup(body.email, body.password);
+  }
+
+  @Post('/signin')
+  @HttpCode(HttpStatus.OK)
+  signin(@Body() body: CreateUserDto) {
+    return this.authService.signin(body.email, body.password);
   }
 
   @Get('/:id')
