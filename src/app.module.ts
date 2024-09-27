@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { ReportsModule } from './reports/reports.module';
+import { ConfigModule } from '@nestjs/config';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
 
@@ -16,6 +17,9 @@ import { Report } from './reports/report.entity';
       database: 'db.sqlite',
       entities: [User, Report],
       synchronize: true,
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
   ],
   controllers: [AppController],

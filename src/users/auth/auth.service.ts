@@ -1,10 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UsersService } from '../users.service';
+import { JwtService } from '@nestjs/jwt';
+import { AuthResponseDto } from '../dtos/auth-response.dto';
 import * as bcrypt from 'bcrypt';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService
+  ) {}
 
   async signup(email: string, password: string) {
     const users = await this.usersService.find(email);
@@ -27,6 +33,11 @@ export class AuthService {
       throw new BadRequestException('Invalid email or password');
     }
 
-    return user;
+    const payload = { email: user.email, sub: user.id };
+    const access_token = await this.jwtService.signAsync(payload);
+
+    return plainToInstance(AuthResponseDto, {
+      access_token,
+    });
   }
 }
