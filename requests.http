@@ -16,16 +16,16 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3000/auth/2
+GET http://localhost:3000/users/2
 
 ###
-GET http://localhost:3000/auth?email=admin-4@email.com
+GET http://localhost:3000/users?email=admin-4@email.com
 
 ###
-DELETE http://localhost:3000/auth/4
+DELETE http://localhost:3000/users/4
 
 ###
-PATCH http://localhost:3000/auth/3
+PATCH http://localhost:3000/users/3
 Content-Type: application/json
 
 {

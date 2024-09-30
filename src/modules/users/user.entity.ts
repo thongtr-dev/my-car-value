@@ -18,6 +18,12 @@ export class User {
   @Column()
   password: string;
 
+  @Column({ nullable: true })
+  refreshToken: string;
+
+  @Column({ type: 'integer', nullable: true })
+  refreshTokenExpiration: number;
+
   @AfterInsert()
   logInsert() {
     console.log('Inserted user with id', this.id);
