@@ -21,7 +21,7 @@ export class User {
   @Column({ nullable: true })
   refreshToken: string;
 
-  @Column({ type: 'integer', nullable: true })
+  @Column({ nullable: true })
   refreshTokenExpiration: number;
 
   @AfterInsert()
