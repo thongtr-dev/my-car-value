@@ -15,12 +15,22 @@ Content-Type: application/json
     "password": "Abc123!@#"
 }
 
+
+### Refresh tokens
+POST http://localhost:3000/auth/refresh-tokens
+Content-Type: application/json
+
+{
+    "id": 9,
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjksImVtYWlsIjoiYWRtaW4tOEBlbWFpbC5jb20iLCJpYXQiOjE3Mjc3NzgyOTksImV4cCI6MTczMDM3MDI5OX0.jAtL9ZPX8BiO4HZCdf-K4aINzCRpllk8O-P57xceWqo"
+}
+
 ###
 GET http://localhost:3000/users/2
 
 ###
-GET http://localhost:3000/users?email=admin-4@email.com
-
+GET http://localhost:3000/users?email=admin-8@email.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjksImVtYWlsIjoiYWRtaW4tOEBlbWFpbC5jb20iLCJpYXQiOjE3Mjc3NzgyOTksImV4cCI6MTcyNzc3ODMyOX0.kuPK4qekhrQVCYn11FW7gLGQmBWopuvZkYZ7d7D26g8
 ###
 DELETE http://localhost:3000/users/4
 

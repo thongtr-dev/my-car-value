@@ -68,15 +68,14 @@ export class AuthService {
     const user = await this.usersService.findOne(userId);
 
     if (!user || user.refreshToken !== refresh_token) {
-      throw new BadRequestException('Invalid refresh token');
+      throw new UnauthorizedException('Invalid refresh token');
     }
 
     const now = Math.floor(Date.now() / 1000);
-    if (user.refreshTokenExpiration <= now) {
-      throw new BadRequestException('Refresh token has expired');
-    }
 
-    const remainingTime = user.refreshTokenExpiration - now;
+    if (user.refreshTokenExpiration <= now) {
+      throw new UnauthorizedException('Refresh token has expired');
+    }
 
     const newRefreshToken = await this.generateToken(
       TokenType.REFRESH,
@@ -91,8 +90,6 @@ export class AuthService {
     );
 
     user.refreshToken = newRefreshToken;
-    user.refreshTokenExpiration = remainingTime;
-
     await this.usersService.update(user.id, user);
 
     return {
