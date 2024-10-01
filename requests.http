@@ -21,8 +21,17 @@ POST http://localhost:3000/auth/refresh-tokens
 Content-Type: application/json
 
 {
-    "id": 9,
+    "id": 4,
     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjksImVtYWlsIjoiYWRtaW4tOEBlbWFpbC5jb20iLCJpYXQiOjE3Mjc3NzgyOTksImV4cCI6MTczMDM3MDI5OX0.jAtL9ZPX8BiO4HZCdf-K4aINzCRpllk8O-P57xceWqo"
+}
+
+### Logout user
+POST http://localhost:3000/auth/logout
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsImVtYWlsIjoiYWRtaW4tOEBlbWFpbC5jb20iLCJpYXQiOjE3Mjc4MDMzNzQsImV4cCI6MTcyNzgwMzQwNH0.Dwd2dQnXnZqiMrlAaNMPYmYr_-Vfy58jrnJJp0yFxgQ
+
+{
+    "id": 4
 }
 
 ###

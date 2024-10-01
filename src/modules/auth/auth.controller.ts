@@ -12,7 +12,7 @@ import { Public } from 'src/common/decorators/public.decorator';
 import { AuthResponseDto } from 'src/common/dtos/auth-response.dto';
 import { CreateUserDto } from 'src/common/dtos/create-user.dto';
 import { RefreshTokenDTO } from './dtos/refresh-token.dto';
-import { AuthenticatedRequest } from './interfaces/authenticated-request.interface';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -40,7 +40,7 @@ export class AuthController {
   }
 
   @Post('/logout')
-  async logout(@Req() req: AuthenticatedRequest) {
-    return this.authService.logout(req.user.userId);
+  async logout(@GetUser('userId') userId: number) {
+    return this.authService.logout(userId);
   }
 }
