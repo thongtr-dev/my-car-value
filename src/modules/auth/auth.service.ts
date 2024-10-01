@@ -25,7 +25,9 @@ export class AuthService {
 
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
-    return this.usersService.create(email, hashedPassword);
+    await this.usersService.create(email, hashedPassword);
+
+    return { message: 'User created successfully' };
   }
 
   async signin(email: string, password: string) {
@@ -51,7 +53,8 @@ export class AuthService {
       user.email
     );
 
-    user.refreshToken = refresh_token;
+    const hashedRefreshToken = await bcrypt.hash(refresh_token, 10);
+    user.refreshToken = hashedRefreshToken;
     user.refreshTokenExpiration =
       Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60; // 30 days
     await this.usersService.update(user.id, user);
@@ -67,12 +70,16 @@ export class AuthService {
   async refreshTokens(userId: number, refresh_token: string) {
     const user = await this.usersService.findOne(userId);
 
-    if (!user || user.refreshToken !== refresh_token) {
+    if (!user) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const isMatch = await bcrypt.compare(refresh_token, user.refreshToken);
+    if (!isMatch) {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
     const now = Math.floor(Date.now() / 1000);
-
     if (user.refreshTokenExpiration <= now) {
       throw new UnauthorizedException('Refresh token has expired');
     }
@@ -89,7 +96,8 @@ export class AuthService {
       user.email
     );
 
-    user.refreshToken = newRefreshToken;
+    const hashedNewRefreshToken = await bcrypt.hash(newRefreshToken, 10);
+    user.refreshToken = hashedNewRefreshToken;
     await this.usersService.update(user.id, user);
 
     return {

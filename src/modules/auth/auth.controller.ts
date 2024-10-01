@@ -10,7 +10,6 @@ import { AuthService } from './auth.service';
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { Public } from 'src/common/decorators/public.decorator';
 import { AuthResponseDto } from 'src/common/dtos/auth-response.dto';
-import { UserDto } from 'src/common/dtos/user.dto';
 import { CreateUserDto } from 'src/common/dtos/create-user.dto';
 import { RefreshTokenDTO } from './dtos/refresh-token.dto';
 import { AuthenticatedRequest } from './interfaces/authenticated-request.interface';
@@ -21,7 +20,6 @@ export class AuthController {
 
   @Public()
   @Post('/signup')
-  @Serialize(UserDto)
   createUser(@Body() body: CreateUserDto) {
     return this.authService.signup(body.email, body.password);
   }
