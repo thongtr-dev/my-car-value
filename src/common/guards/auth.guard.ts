@@ -29,25 +29,29 @@ export class AuthGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
+    const access_token = this.extractAccessTokenFromHeader(request);
 
-    if (!token) {
-      throw new UnauthorizedException();
+    if (!access_token) {
+      throw new UnauthorizedException('Access token not found');
     }
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const payload = await this.jwtService.verifyAsync(access_token, {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
-      request['user'] = payload;
+      request['user'] = {
+        userId: payload.sub,
+        email: payload.email,
+      };
     } catch {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalid access token');
     }
 
     return true;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+  private extractAccessTokenFromHeader(request: Request): string | undefined {
+    const [type, access_token] =
+      request.headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? access_token : undefined;
   }
 }

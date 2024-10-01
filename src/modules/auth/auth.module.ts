@@ -18,9 +18,19 @@ import { User } from '../users/user.entity';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
+        secret: configService.get<string>('JWT_ACCESS_SECRET'),
         signOptions: {
-          expiresIn: '15m',
+          expiresIn: configService.get<string>('JWT_ACCESS_EXPIRATION'),
+        },
+      }),
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_REFRESH_SECRET'),
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_REFRESH_EXPIRATION'),
         },
       }),
     }),

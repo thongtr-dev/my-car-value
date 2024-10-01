@@ -1,13 +1,20 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from 'src/modules/users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { TokenType } from 'src/common/enums/tokenType.enum';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService
   ) {}
 
   async signup(email: string, password: string) {
@@ -20,6 +27,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(password, salt);
     return this.usersService.create(email, hashedPassword);
   }
+
   async signin(email: string, password: string) {
     const [user] = await this.usersService.find(email);
     if (!user) {
@@ -31,14 +39,17 @@ export class AuthService {
       throw new BadRequestException('Invalid email or password');
     }
 
-    const payload = { email: user.email, sub: user.id };
-    const access_token = await this.jwtService.signAsync(payload, {
-      expiresIn: '15m',
-    });
+    const access_token = await this.generateToken(
+      TokenType.ACCESS,
+      user.id,
+      user.email
+    );
 
-    const refresh_token = await this.jwtService.signAsync(payload, {
-      expiresIn: '30d',
-    });
+    const refresh_token = await this.generateToken(
+      TokenType.REFRESH,
+      user.id,
+      user.email
+    );
 
     user.refreshToken = refresh_token;
     user.refreshTokenExpiration =
@@ -51,5 +62,76 @@ export class AuthService {
       access_token,
       refresh_token,
     };
+  }
+
+  async refreshTokens(userId: number, refresh_token: string) {
+    const user = await this.usersService.findOne(userId);
+
+    if (!user || user.refreshToken !== refresh_token) {
+      throw new BadRequestException('Invalid refresh token');
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+    if (user.refreshTokenExpiration <= now) {
+      throw new BadRequestException('Refresh token has expired');
+    }
+
+    const remainingTime = user.refreshTokenExpiration - now;
+
+    const newRefreshToken = await this.generateToken(
+      TokenType.REFRESH,
+      user.id,
+      user.email
+    );
+
+    const newAccessToken = await this.generateToken(
+      TokenType.ACCESS,
+      user.id,
+      user.email
+    );
+
+    user.refreshToken = newRefreshToken;
+    user.refreshTokenExpiration = remainingTime;
+
+    await this.usersService.update(user.id, user);
+
+    return {
+      id: user.id,
+      email: user.email,
+      access_token: newAccessToken,
+      refresh_token: newRefreshToken,
+    };
+  }
+
+  async logout(userId: number) {
+    const user = await this.usersService.findOne(userId);
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    // Clear refresh token and expiration
+    user.refreshToken = null;
+    user.refreshTokenExpiration = null;
+
+    await this.usersService.update(user.id, user);
+
+    return { message: 'Logged out successfully' };
+  }
+
+  private generateToken(tokenType: string, userId: number, email: string) {
+    const payload = { sub: userId, email };
+    switch (tokenType) {
+      case TokenType.ACCESS:
+        return this.jwtService.signAsync(payload, {
+          expiresIn: this.configService.get<string>('JWT_ACCESS_EXPIRATION'),
+        });
+      case TokenType.REFRESH:
+        return this.jwtService.signAsync(payload, {
+          expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION'),
+        });
+      default:
+        break;
+    }
   }
 }
