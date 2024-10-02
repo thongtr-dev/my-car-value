@@ -14,26 +14,18 @@ import { User } from '../users/user.entity';
   imports: [
     UsersModule,
     TypeOrmModule.forFeature([User]),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_ACCESS_SECRET'),
-        signOptions: {
-          expiresIn: configService.get<string>('JWT_ACCESS_EXPIRATION'),
-        },
-      }),
-    }),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_REFRESH_SECRET'),
-        signOptions: {
-          expiresIn: configService.get<string>('JWT_REFRESH_EXPIRATION'),
-        },
-      }),
-    }),
+    JwtModule.registerAsync(
+      AuthModule.createJwtModuleOptions(
+        'JWT_ACCESS_SECRET',
+        'JWT_ACCESS_EXPIRATION'
+      )
+    ),
+    JwtModule.registerAsync(
+      AuthModule.createJwtModuleOptions(
+        'JWT_REFRESH_SECRET',
+        'JWT_REFRESH_EXPIRATION'
+      )
+    ),
   ],
   controllers: [AuthController],
   providers: [
@@ -45,4 +37,20 @@ import { User } from '../users/user.entity';
     },
   ],
 })
-export class AuthModule {}
+export class AuthModule {
+  protected static createJwtModuleOptions(
+    secretKey: string,
+    expirationKey: string
+  ) {
+    return {
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>(secretKey),
+        signOptions: {
+          expiresIn: configService.get<string>(expirationKey),
+        },
+      }),
+    };
+  }
+}
