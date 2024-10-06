@@ -3,10 +3,10 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UsersService } from 'src/modules/users/users.service';
+import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { TokenType } from 'src/common/enums/tokenType.enum';
+import { TokenType } from '../../common/enums/tokenType.enum';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
